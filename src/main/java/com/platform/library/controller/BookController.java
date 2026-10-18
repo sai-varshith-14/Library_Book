@@ -4,6 +4,7 @@ import com.platform.library.dto.BookRequest;
 import com.platform.library.dto.BookResponse;
 import com.platform.library.entity.BookEntity;
 import com.platform.library.service.BookService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<?> create(@RequestBody BookRequest book){
+    public ResponseEntity<?> create(@RequestBody @Valid BookRequest book){
         try {
             BookResponse savedBook = bookService.create(book);
             // Returns 201 Created on success
@@ -58,7 +59,7 @@ public class BookController {
     }
 
     @PutMapping("/books/{id}")
-    public ResponseEntity<?> updateBookById(@PathVariable Long id, @RequestBody BookRequest updateBook){
+    public ResponseEntity<?> updateBookById(@PathVariable Long id, @RequestBody @Valid BookRequest updateBook){
         try{
             BookResponse updatedBook = bookService.updateById(id,updateBook);
             return ResponseEntity.status(OK).body(updatedBook);
