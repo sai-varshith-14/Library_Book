@@ -1,9 +1,13 @@
 package com.platform.library.service;
 
+import com.platform.library.dto.BookRequest;
+import com.platform.library.dto.BookResponse;
 import com.platform.library.entity.BookEntity;
 import com.platform.library.repository.BookRepository;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,7 +19,7 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public BookEntity create(BookEntity book) {
+    public BookResponse create(BookRequest book) {
         if(bookRepository.existsByIsbn(book.getIsbn())){
             throw new RuntimeException("A book with ISBN " + book.getIsbn() + " already exists!");
         }
@@ -23,27 +27,30 @@ public class BookService {
             throw new RuntimeException("Published Year is Invalid");
         }
         if(book.getPublishedYear() == null || book.getIsbn() == null || book.getAuthor() == null || book.getTitle() == null){
-            throw new RuntimeException("Invalid Details, Fill fill in all the required details");
+            throw new RuntimeException("Invalid Details, Fill in all the required details");
 //            check this once later by re-creating the database
         }
-        return bookRepository.save(book);
+        BookEntity savedBook = bookRepository.save(toEntity(book));
+        return toBookResponse(savedBook);
     }
 
 
-    public List<BookEntity> getAllBooks() {
+    public List<BookResponse> getAllBooks() {
         if(bookRepository.count() == 0){
             throw new RuntimeException("There are no books present in the Library");
         }
-        return bookRepository.findAll();
+        List<BookEntity> allBooks = bookRepository.findAll();
+        return allBooks.stream().map(this::toBookResponse).toList();
+
     }
 
-    public BookEntity getById(Long id) {
+    public BookResponse getById(Long id) {
         BookEntity dbBook = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
-        return dbBook;
+        return toBookResponse(dbBook);
     }
 
 
-    public BookEntity updateById(Long id, BookEntity updateBook) {
+    public BookResponse updateById(Long id, BookRequest updateBook) {
         BookEntity updatedBook = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("No Such Book exists in the library"));
 
         updatedBook.setAuthor(updateBook.getAuthor());
@@ -52,8 +59,8 @@ public class BookService {
         updatedBook.setPublishedYear(updateBook.getPublishedYear());
         updatedBook.setTitle(updateBook.getTitle());
 
-
-        return bookRepository.save(updatedBook);
+        bookRepository.save(updatedBook);
+        return toBookResponse(updatedBook);
     }
 
     public boolean deleteBookById(Long id) {
@@ -63,4 +70,13 @@ public class BookService {
         }
         return false;
     }
+
+    private BookEntity toEntity(BookRequest b){
+        return new BookEntity(b.getTitle(),b.getAuthor(),b.getIsbn(), b.getPublishedYear(), b.isAvailable());
+    }
+
+    private BookResponse toBookResponse(BookEntity b){
+        return new BookResponse(b.getAuthor(),b.isAvailable(),b.getCreatedAt(),b.getId(),b.getIsbn(),b.getPublishedYear(),b.getTitle());
+    }
+
 }

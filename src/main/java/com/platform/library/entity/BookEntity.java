@@ -88,14 +88,12 @@ public class BookEntity {
         return title;
     }
 
-    public BookEntity(String author, boolean available, LocalDateTime createdAt, Long id, String isbn, Integer publishedYear, String title) {
+    public BookEntity(String title, String author, String isbn, Integer publishedYear, boolean available) {
+        this.title = title;
         this.author = author;
-        this.available = available;
-        this.createdAt = createdAt;
-        this.id = id;
         this.isbn = isbn;
         this.publishedYear = publishedYear;
-        this.title = title;
+        this.available = available;
     }
 
     public BookEntity() {

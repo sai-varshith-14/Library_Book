@@ -1,5 +1,7 @@
 package com.platform.library.controller;
 
+import com.platform.library.dto.BookRequest;
+import com.platform.library.dto.BookResponse;
 import com.platform.library.entity.BookEntity;
 import com.platform.library.service.BookService;
 import org.springframework.http.HttpStatus;
@@ -16,15 +18,14 @@ import static org.springframework.http.HttpStatus.OK;
 public class BookController {
 
     BookService bookService;
-
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
     @PostMapping("/books")
-    public ResponseEntity<?> upload(@RequestBody BookEntity book){
+    public ResponseEntity<?> create(@RequestBody BookRequest book){
         try {
-            BookEntity savedBook = bookService.create(book);
+            BookResponse savedBook = bookService.create(book);
             // Returns 201 Created on success
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
         } catch (RuntimeException e) {
@@ -36,7 +37,7 @@ public class BookController {
     @GetMapping("/books")
     public ResponseEntity<?> getAllBooks(){
         try{
-            List<BookEntity> booksAvailable = bookService.getAllBooks();
+            List<BookResponse> booksAvailable = bookService.getAllBooks();
             return ResponseEntity.status(OK).body(booksAvailable);
         }
         catch(RuntimeException e){
@@ -48,7 +49,7 @@ public class BookController {
     public ResponseEntity<?> getBookById(@PathVariable Long id){
 
         try{
-            BookEntity bookAvailable = bookService.getById(id);
+            BookResponse bookAvailable = bookService.getById(id);
             return ResponseEntity.status(OK).body(bookAvailable);
         }
         catch (RuntimeException e){
@@ -57,9 +58,9 @@ public class BookController {
     }
 
     @PutMapping("/books/{id}")
-    public ResponseEntity<?> updateBookById(@PathVariable Long id, @RequestBody BookEntity updateBook){
+    public ResponseEntity<?> updateBookById(@PathVariable Long id, @RequestBody BookRequest updateBook){
         try{
-            BookEntity updatedBook = bookService.updateById(id,updateBook);
+            BookResponse updatedBook = bookService.updateById(id,updateBook);
             return ResponseEntity.status(OK).body(updatedBook);
         }
         catch(RuntimeException e){
